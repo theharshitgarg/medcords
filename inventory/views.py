@@ -38,6 +38,8 @@ class InventoryItemListGenerics(generics.ListCreateAPIView):
     queryset = InventoryItem.objects.all()
     serializer_class = InventoryItemSerializer
     pagination_class = PageNumberPagination
+    default_per_page = 10
+    default_page = 1
 
     def get_paginated_response(self, page=1, per_page=10):
         paginator = Paginator(self.queryset, per_page)
@@ -45,15 +47,15 @@ class InventoryItemListGenerics(generics.ListCreateAPIView):
 
 
     def list(self, request):
-        page = self.request.GET.get('page')
-        per_page = self.request.GET.get('per_page')
+        page = self.request.GET.get('page') or self.default_page
+        per_page = self.request.GET.get('per_page') or self.default_per_page
 
         paginated_queryset = self.get_paginated_response(page, per_page)
         serializer = InventoryItemSerializer(paginated_queryset, many=True)
         json = {
             'page': page,
             'data': serializer.data,
-            'per_page': request.GET['per_page'],
+            'per_page': per_page,
             'total': paginated_queryset.end_index()-paginated_queryset.start_index()+1
         }
 
