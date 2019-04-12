@@ -4,5 +4,5 @@ from django.conf.urls import url
 from inventory import views
 
 urlpatterns = [
-    url(r'^list/', views.InventoryItemListGenerics.as_view()),
+    url(r'', views.InventoryItemListGenerics.as_view()),
 ]
