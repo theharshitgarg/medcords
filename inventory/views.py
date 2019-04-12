@@ -30,33 +30,30 @@ def inventory_list(request):
         return JsonResponse(serializer.errors, status=400)
 
 
+class InventoryItemPagination(PageNumberPagination):
+    page_size_query_param = 'per_page'
+
+    def get_paginated_response(self, data):
+        return Response({
+            'next': self.get_next_link(),
+            'previous': self.get_previous_link(),
+            'total': self.page.paginator.count,
+            'count': self.get_page_size(self.request),
+            'results': data,
+        })
+
+
 class InventoryItemListGenerics(generics.ListCreateAPIView):
     """
-    List all items, or create a new item.
+    List all items, or crate a new item.
     """
 
     queryset = InventoryItem.objects.all()
     serializer_class = InventoryItemSerializer
-    pagination_class = PageNumberPagination
-    default_per_page = 10
-    default_page = 1
-
-    def get_paginated_response(self, page=1, per_page=10):
-        paginator = Paginator(self.queryset, per_page)
-        return paginator.page(page)
-
+    pagination_class = InventoryItemPagination
 
     def list(self, request):
-        page = self.request.GET.get('page') or self.default_page
-        per_page = self.request.GET.get('per_page') or self.default_per_page
-
-        paginated_queryset = self.get_paginated_response(page, per_page)
+        paginated_queryset = self.paginate_queryset(self.get_queryset())
         serializer = InventoryItemSerializer(paginated_queryset, many=True)
-        json = {
-            'page': page,
-            'data': serializer.data,
-            'per_page': per_page,
-            'total': paginated_queryset.end_index()-paginated_queryset.start_index()+1
-        }
 
-        return Response(json)
+        return self.get_paginated_response(serializer.data)

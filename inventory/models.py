@@ -8,16 +8,15 @@ from django.utils import timezone
 
 
 class InventoryItem(models.Model):
-	quantity = models.IntegerField(default=0)
-	name = models.CharField(max_length=100)
+    quantity = models.IntegerField(default=0)
+    name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name + " : " + str(self.quantity)
 
-	def __str__(self):
-		return self.name + " : " + str(self.quantity)
-
-	@property
-	def is_available(self):
-		return self.quantity > 0
+    @property
+    def is_available(self):
+        return self.quantity > 0
 
 
 # class PurchaseItem(models.Model):
