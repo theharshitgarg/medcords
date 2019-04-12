@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from django.utils import timezone
 
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 
@@ -34,4 +34,3 @@ class InventoryItem(models.Model):
 
 # 	def is_available(self):
 # 		return self.quantity > 0
-

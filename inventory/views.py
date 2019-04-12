@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.conf import settings
+from django.http import Http404, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from django.http import Http404, JsonResponse
-from rest_framework.response import Response
-from rest_framework import status
-from django.conf import settings
-
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
 from .models import InventoryItem
 from .serializers import InventoryItemSerializer
@@ -46,5 +44,3 @@ class InventoryItemListGenerics(generics.ListCreateAPIView):
         queryset = self.get_queryset()
         serializer = InventoryItemSerializer(queryset, many=True)
         return Response(serializer.data)
-
-
