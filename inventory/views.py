@@ -8,6 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
+from django.core.paginator import Paginator
+
 
 from .models import InventoryItem
 from .serializers import InventoryItemSerializer
@@ -37,10 +39,22 @@ class InventoryItemListGenerics(generics.ListCreateAPIView):
     serializer_class = InventoryItemSerializer
     pagination_class = PageNumberPagination
 
-    #TODO: pagination
+    def get_paginated_response(self, page=1, per_page=10):
+        paginator = Paginator(self.queryset, per_page)
+        return paginator.page(page)
+
 
     def list(self, request):
-        print self.request.GET
-        queryset = self.get_queryset()
-        serializer = InventoryItemSerializer(queryset, many=True)
-        return Response(serializer.data)
+        page = self.request.GET.get('page')
+        per_page = self.request.GET.get('per_page')
+
+        paginated_queryset = self.get_paginated_response(page, per_page)
+        serializer = InventoryItemSerializer(paginated_queryset, many=True)
+        json = {
+            'page': page,
+            'data': serializer.data,
+            'per_page': request.GET['per_page'],
+            'total': paginated_queryset.end_index()-paginated_queryset.start_index()+1
+        }
+
+        return Response(json)
