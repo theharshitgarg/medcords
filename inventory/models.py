@@ -16,12 +16,25 @@ class InventoryItem(models.Model):
 
     @property
     def is_available(self):
-        return self.quantity > 0
+        return self.check_quantity()
 
+    def check_quantity(self, quantity=0):
+        return self.quantity >= quantity
+
+    def purchase(self, quantity):
+        resp = {
+            "errros": [],
+            "status": True
+        }
+        if quantity > 0 and self.check_quantity(quantity):
+            self.quantity -= quantity
+
+        else:
+            raise Exception("Invalid Quantity")
 
 # class PurchaseItem(models.Model):
 # 	purchased_on = models.DateTimeField(default=timezone.now)
-# 	items = models.
+# 	items = models.ListField()
 
 
 # class Purchase(models.Model):

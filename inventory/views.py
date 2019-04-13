@@ -5,9 +5,11 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import InventoryItem
 from .serializers import InventoryItemSerializer
+from . import serializers
 
 
 class InventoryItemPagination(PageNumberPagination):
@@ -37,3 +39,22 @@ class InventoryItemListGenerics(generics.ListCreateAPIView):
         serializer = InventoryItemSerializer(paginated_queryset, many=True)
 
         return self.get_paginated_response(serializer.data)
+
+
+class InventoryPurchaseGenerics(generics.CreateAPIView):
+    """
+    Make a purchase, either all items are purchased or nore.
+    """
+
+    serializer_class = serializers.PurchaseSerializer
+
+    def update_inventory(self):
+        s = serializers.PurchaseSerializer(self.request.data)
+        resp = s.update_inventory()
+
+        return resp
+
+    def post(self, request):
+        response = self.update_inventory()
+
+        return JsonResponse(response)
